@@ -27,6 +27,7 @@ class BlogsController < ApplicationController
     @blog = Blog.new(blog_params)
     if @blog.save
       TitlesChangeJob.set(wait_until: Date.tomorrow.noon).perform_later(@blog.id)
+      NoticeMailer.sendmail_blog(@blog).deliver_later
       redirect_to blogs_path, notice: 'Blog was successfully created.'
     else
       render :new
